@@ -1,0 +1,9 @@
+package componentized:secrets@0.1.0-dev;
+
+world provider {
+    export store;
+}
+
+world imports {
+    import store;
+}

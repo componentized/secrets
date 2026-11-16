@@ -1,0 +1,16 @@
+@since(version = 0.1.0-dev)
+interface store {
+
+    variant error-code {
+        not-found,
+        other(option<string>),
+    }
+
+    variant secret {
+        %string(string),
+        bytes(list<u8>),
+    }
+
+    get: async func(key: string) -> result<secret, error-code>;
+
+}

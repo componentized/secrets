@@ -1,0 +1,10 @@
+package componentized:secrets-components;
+
+world empty {
+    export componentized:secrets/store@0.1.0-dev;
+}
+
+world from-config {
+    import wasi:config/store@0.2.0-rc.1;
+    export componentized:secrets/store@0.1.0-dev;
+}
