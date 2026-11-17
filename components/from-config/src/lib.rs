@@ -1,21 +1,43 @@
 //! `componentized:secrets`, backed by `wasi:config`, for hosts without secrets, e.g. wasmtime. Each secret
-//! is the config value of the same key, a missing key is not found.
+//! is the config value of the same key, a missing key is not found. The config values are read once, by the
+//! first `init`.
+
+use std::collections::HashMap;
+use std::sync::OnceLock;
 
 use exports::componentized::secrets::store::{
     Guest as StoreGuest, Secret, ErrorCode,
 };
 use wasi::config::store as config;
 
+/// The config values, or the error reading them, read once by the first `init`.
+static SECRETS: OnceLock<Result<HashMap<String, String>, ErrorCode>> = OnceLock::new();
+
 struct Component;
 
 impl StoreGuest for Component {
-    async fn get(key: String) -> Result<Secret, ErrorCode> {
-        match config::get(&key) {
-            Ok(Some(value)) => Ok(Secret::String(value)),
-            Ok(None) => Err(ErrorCode::NotFound),
-            Err(config::Error::Upstream(message)) => Err(ErrorCode::Other(Some(format!("upstream: {message}")))),
-            Err(config::Error::Io(message)) => Err(ErrorCode::Other(Some(format!("io: {message}")))),
-        }
+    async fn init() -> Result<(), ErrorCode> {
+        SECRETS
+            .get_or_init(|| {
+                let values = config::get_all().map_err(|err| match err {
+                    config::Error::Upstream(message) => ErrorCode::Other(Some(format!("upstream: {message}"))),
+                    config::Error::Io(message) => ErrorCode::Other(Some(format!("io: {message}"))),
+                })?;
+                Ok(values.into_iter().collect())
+            })
+            .as_ref()
+            .map(|_| ())
+            .map_err(Clone::clone)
+    }
+
+    fn get(key: String) -> Result<Secret, ErrorCode> {
+        let Some(Ok(secrets)) = SECRETS.get() else {
+            return Err(ErrorCode::NotInitialized);
+        };
+        secrets
+            .get(&key)
+            .map(|value| Secret::String(value.clone()))
+            .ok_or(ErrorCode::NotFound)
     }
 }
 
