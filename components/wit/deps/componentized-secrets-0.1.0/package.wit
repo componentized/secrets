@@ -1,8 +1,8 @@
 /// Secrets for components, sensitive values looked up by key.
-package componentized:secrets@0.1.0-dev;
+package componentized:secrets@0.1.0;
 
 /// A store of secrets, sensitive values looked up by key, e.g. passwords, tokens and keys.
-@since(version = 0.1.0-dev)
+@since(version = 0.1.0)
 interface store {
   /// The value of a secret.
   variant secret {
