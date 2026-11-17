@@ -9,6 +9,30 @@ world from-config {
     export componentized:secrets/store@0.1.1-dev;
 }
 
+world gate {
+    import componentized:secrets/latch@0.1.1-dev;
+    import wasi:logging/logging@0.1.0-draft;
+    import componentized:secrets/store@0.1.1-dev;
+    export componentized:secrets/store@0.1.1-dev;
+}
+
+world latch {
+    import wasi:config/store@0.2.0-rc.1;
+    import wasi:logging/logging@0.1.0-draft;
+    export componentized:secrets/latch@0.1.1-dev;
+}
+
+/// Aggregates the latches it imports into one, the `latch-n` components each use the first of them,
+/// e.g. `latch-n2` uses `latch0` and `latch1`.
+world latch-n {
+    export componentized:secrets/latch@0.1.1-dev;
+    import latch0: componentized:secrets/latch@0.1.1-dev;
+    import latch1: componentized:secrets/latch@0.1.1-dev;
+    import latch2: componentized:secrets/latch@0.1.1-dev;
+    import latch3: componentized:secrets/latch@0.1.1-dev;
+    import latch4: componentized:secrets/latch@0.1.1-dev;
+}
+
 /// Calls a `componentized:secrets/store` the way a consumer does, for the tests of each component.
 interface probe {
     use componentized:secrets/store@0.1.1-dev.{error-code, secret};
@@ -30,5 +54,20 @@ interface probe {
 
 world test-consumer {
     import componentized:secrets/store@0.1.1-dev;
+    export probe;
+}
+
+/// The host the tests run the components with, see crates/test-harness. Provides the imports of every component,
+/// and calls the latches and the probe. The host provides the latch a gate imports, as well as the
+/// named latches a `latch-n` imports.
+world test-host {
+    import latch0: componentized:secrets/latch@0.1.1-dev;
+    import latch1: componentized:secrets/latch@0.1.1-dev;
+    import latch2: componentized:secrets/latch@0.1.1-dev;
+    import latch3: componentized:secrets/latch@0.1.1-dev;
+    import latch4: componentized:secrets/latch@0.1.1-dev;
+    import wasi:config/store@0.2.0-rc.1;
+    import wasi:logging/logging@0.1.0-draft;
+    export componentized:secrets/latch@0.1.1-dev;
     export probe;
 }

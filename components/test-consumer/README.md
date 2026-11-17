@@ -1,6 +1,6 @@
 # test-consumer
 
-A consumer of `componentized:secrets`, plugged into each component for its tests, see [`tests`](../../tests/). Records whether `init` resolves on its first poll.
+A consumer of `componentized:secrets`, plugged into each component for its tests, see [`test-harness`](../../crates/test-harness/). Records whether `init` resolves on its first poll.
 
 ## Interfaces
 

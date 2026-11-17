@@ -1,0 +1,9 @@
+// `test-consumer` calling `gate`, gating `from-config`, for the tests of `gate`. The latch, logging
+// and the secrets' config are imported from the test host.
+package componentized:test-gate;
+
+let secrets = new local:from-config { ... };
+let gate = new local:gate { store: secrets.store, ... };
+let consumer = new local:test-consumer { store: gate.store };
+
+export consumer.probe;

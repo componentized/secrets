@@ -1,6 +1,6 @@
 //! The tests of `empty`, plugged into `test-consumer` as `test-empty`.
 
-use crate::host::{Consumer, ErrorCode, Host};
+use test_harness::{Consumer, ErrorCode, Host};
 
 async fn consumer() -> Consumer {
     Consumer::new("test-empty", Host::default()).await.unwrap()

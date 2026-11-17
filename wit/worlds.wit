@@ -2,11 +2,17 @@
 package componentized:secrets@0.1.1-dev;
 
 /// A component that provides secrets, e.g. from a vault or another source of secrets.
+@since(version = 0.1.0)
 world provider {
+    @since(version = 0.1.0)
     export store;
 }
 
 /// The interfaces to import to use secrets.
+@since(version = 0.1.0)
 world imports {
+    @since(version = 0.1.0)
     import store;
+    @since(version = 0.1.1-dev)
+    import latch;
 }
