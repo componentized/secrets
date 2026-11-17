@@ -8,3 +8,27 @@ world from-config {
     import wasi:config/store@0.2.0-rc.1;
     export componentized:secrets/store@0.1.0-dev;
 }
+
+/// Calls a `componentized:secrets/store` the way a consumer does, for the tests of each component.
+interface probe {
+    use componentized:secrets/store@0.1.0-dev.{error-code, secret};
+
+    /// A call to `store.init`.
+    record init-call {
+        /// Whether the call resolved on its first poll, without waiting on the store.
+        immediate: bool,
+        /// The result of the call.
+        %result: result<_, error-code>,
+    }
+
+    /// Calls `store.init`, waiting for it to resolve.
+    init: async func() -> init-call;
+
+    /// Calls `store.get`.
+    get: func(key: string) -> result<secret, error-code>;
+}
+
+world test-consumer {
+    import componentized:secrets/store@0.1.0-dev;
+    export probe;
+}

@@ -2,9 +2,7 @@
 
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use exports::componentized::secrets::store::{
-    Guest as StoreGuest, Secret, ErrorCode,
-};
+use exports::componentized::secrets::store::{ErrorCode, Guest as StoreGuest, Secret};
 
 static INITIALIZED: AtomicBool = AtomicBool::new(false);
 
@@ -12,7 +10,11 @@ struct Component;
 
 impl StoreGuest for Component {
     async fn init() -> Result<(), ErrorCode> {
-        INITIALIZED.store(true, Ordering::Relaxed);
+        if !INITIALIZED.load(Ordering::Relaxed) {
+            // never resolve the first init immediately, so callers handle init as async work
+            wit_bindgen::yield_async().await;
+            INITIALIZED.store(true, Ordering::Relaxed);
+        }
         Ok(())
     }
 

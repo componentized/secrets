@@ -1,0 +1,3 @@
+# the store under test, plugged into the consumer
+test-consumer
+empty

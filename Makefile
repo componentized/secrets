@@ -2,3 +2,7 @@
 # README.md
 
 include build/build.mk
+
+# `make test` builds the components before the tests, which otherwise build the composition each
+# loads, see tests/src/host.rs
+test: export COMPONENTS_BUILT := true
