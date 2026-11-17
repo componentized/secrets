@@ -5,9 +5,7 @@
 use std::collections::HashMap;
 use std::sync::OnceLock;
 
-use exports::componentized::secrets::store::{
-    Guest as StoreGuest, Secret, ErrorCode,
-};
+use exports::componentized::secrets::store::{ErrorCode, Guest as StoreGuest, Secret};
 use wasi::config::store as config;
 
 /// The config values, or the error reading them, read once by the first `init`.
@@ -17,10 +15,16 @@ struct Component;
 
 impl StoreGuest for Component {
     async fn init() -> Result<(), ErrorCode> {
+        if SECRETS.get().is_none() {
+            // never resolve the first init immediately, so callers handle init as async work
+            wit_bindgen::yield_async().await;
+        }
         SECRETS
             .get_or_init(|| {
                 let values = config::get_all().map_err(|err| match err {
-                    config::Error::Upstream(message) => ErrorCode::Other(Some(format!("upstream: {message}"))),
+                    config::Error::Upstream(message) => {
+                        ErrorCode::Other(Some(format!("upstream: {message}")))
+                    }
                     config::Error::Io(message) => ErrorCode::Other(Some(format!("io: {message}"))),
                 })?;
                 Ok(values.into_iter().collect())

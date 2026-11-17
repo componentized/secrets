@@ -29,6 +29,14 @@ Prereqs:
 make components
 ```
 
+To test the components:
+
+```sh
+make test
+```
+
+Each component is plugged into [`test-consumer`](./components/test-consumer/), which calls the store the way a consumer does, e.g. [`test-empty`](./components/test-empty/). The [tests](./tests/) run each composition with wasmtime.
+
 ## Community
 
 ### Code of Conduct
