@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use crate::host::{ConfigError, Consumer, ErrorCode, Host, Secret};
+use test_harness::{ConfigError, Consumer, ErrorCode, Host, Secret};
 
 async fn consumer(config: Result<HashMap<String, String>, ConfigError>) -> Consumer {
     Consumer::new("test-from-config", Host { config, ..Host::default() }).await.unwrap()

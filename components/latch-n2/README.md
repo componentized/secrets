@@ -1,0 +1,17 @@
+# latch-n2
+
+`componentized:secrets` latch that aggregates 2 latches, any latch can deny an operation.
+
+The latches are asked in order, `latch0`, `latch1`, and the first denial is the decision. Latches after a denial are not asked, but every latch observes the final decision with `observe-decision`, even when an earlier latch fails to observe it. The first failure is returned. A latch error from `authorize` is returned without asking the latches after it.
+
+## Interfaces
+
+Imports:
+
+- `latch0`: `componentized:secrets/latch@0.1.1-dev`, a latch to aggregate
+- `latch1`: `componentized:secrets/latch@0.1.1-dev`, a latch to aggregate
+- `componentized:secrets/store@0.1.1-dev`: the types of the operations being authorized
+
+Exports:
+
+- `componentized:secrets/latch@0.1.1-dev`: the latch

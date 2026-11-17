@@ -17,6 +17,14 @@ A collection of utility components for sensitive values.
 - [`empty`](./components/empty/)
 - [`from-config`](./components/from-config/)
 
+Access control, a [`gate`](./components/gate/) consults a latch before each `get`, see [`latch.wit`](./wit/latch.wit):
+
+- [`gate`](./components/gate/)
+- [`latch-defer-all`](./components/latch-defer-all/)
+- [`latch-deny-all`](./components/latch-deny-all/)
+- [`latch-key`](./components/latch-key/)
+- [`latch-n2`](./components/latch-n2/), [`latch-n3`](./components/latch-n3/), [`latch-n4`](./components/latch-n4/), [`latch-n5`](./components/latch-n5/), aggregate 2 to 5 latches into one
+
 ## Build
 
 A [dev container](https://containers.dev) is available that contains the necessary tools and configuration out of the box.
@@ -35,7 +43,7 @@ To test the components:
 make test
 ```
 
-Each component is plugged into [`test-consumer`](./components/test-consumer/), which calls the store the way a consumer does, e.g. [`test-empty`](./components/test-empty/). The [tests](./tests/) run each composition with wasmtime.
+Each store is plugged into [`test-consumer`](./components/test-consumer/), which calls the store the way a consumer does, e.g. [`test-empty`](./components/test-empty/), and each component's tests, in its `tests` directory, run the composition with wasmtime, with the [`test-harness`](./crates/test-harness/). The `gate` is tested between the consumer and a store, [`test-gate`](./components/test-gate/), with a latch the tests provide. The latches are called by the tests directly.
 
 ## Community
 

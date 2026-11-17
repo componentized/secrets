@@ -374,6 +374,8 @@ checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
 name = "empty"
 version = "0.1.0"
 dependencies = [
+ "test-harness",
+ "tokio",
  "wit-bindgen",
 ]
 
@@ -441,6 +443,8 @@ checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
 name = "from-config"
 version = "0.1.0"
 dependencies = [
+ "test-harness",
+ "tokio",
  "wit-bindgen",
 ]
 
@@ -520,6 +524,15 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+]
+
+[[package]]
+name = "gate"
+version = "0.1.0"
+dependencies = [
+ "test-harness",
+ "tokio",
+ "wit-bindgen",
 ]
 
 [[package]]
@@ -661,6 +674,69 @@ dependencies = [
  "cfg-if",
  "futures-util",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "latch-defer-all"
+version = "0.1.0"
+dependencies = [
+ "test-harness",
+ "tokio",
+ "wit-bindgen",
+]
+
+[[package]]
+name = "latch-deny-all"
+version = "0.1.0"
+dependencies = [
+ "test-harness",
+ "tokio",
+ "wit-bindgen",
+]
+
+[[package]]
+name = "latch-key"
+version = "0.1.0"
+dependencies = [
+ "test-harness",
+ "tokio",
+ "wit-bindgen",
+]
+
+[[package]]
+name = "latch-n2"
+version = "0.1.0"
+dependencies = [
+ "secrets-latch-n",
+ "test-harness",
+ "tokio",
+]
+
+[[package]]
+name = "latch-n3"
+version = "0.1.0"
+dependencies = [
+ "secrets-latch-n",
+ "test-harness",
+ "tokio",
+]
+
+[[package]]
+name = "latch-n4"
+version = "0.1.0"
+dependencies = [
+ "secrets-latch-n",
+ "test-harness",
+ "tokio",
+]
+
+[[package]]
+name = "latch-n5"
+version = "0.1.0"
+dependencies = [
+ "secrets-latch-n",
+ "test-harness",
+ "tokio",
 ]
 
 [[package]]
@@ -939,6 +1015,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
+name = "secrets-latch-n"
+version = "0.1.0"
+dependencies = [
+ "wit-bindgen",
+]
+
+[[package]]
 name = "semver"
 version = "1.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1101,8 +1184,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "tests"
-version = "0.0.0"
+name = "test-harness"
+version = "0.1.0"
 dependencies = [
  "tokio",
  "wasmtime",

@@ -3,6 +3,7 @@
 interface store {
 
     /// The value of a secret.
+    @since(version = 0.1.0)
     variant secret {
         /// A secret that is text.
         %string(string),
@@ -13,6 +14,7 @@ interface store {
     }
 
     /// An error getting a secret.
+    @since(version = 0.1.0)
     variant error-code {
         /// The store is not initialized, call `init()` first.
         not-initialized,
@@ -27,6 +29,7 @@ interface store {
     ///
     /// The store must be initialized before use. Secrets are immutable after
     /// initialization completes. Subsequent calls to initialize are no-ops.
+    @since(version = 0.1.0)
     init: async func() -> result<_, error-code>;
 
     /// Gets the secret for the key.
@@ -34,6 +37,7 @@ interface store {
     /// Returns `error-code::not-found` when the store has no secret for the
     /// key. Returns `error-code::not-initialized` when the store is not
     /// initialized, call `init()` first.
+    @since(version = 0.1.0)
     get: func(key: string) -> result<secret, error-code>;
 
 }
