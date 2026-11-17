@@ -1,5 +1,5 @@
 /// Secrets for components, sensitive values looked up by key.
-package componentized:secrets@0.1.0;
+package componentized:secrets@0.1.1-dev;
 
 /// A component that provides secrets, e.g. from a vault or another source of secrets.
 world provider {

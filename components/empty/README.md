@@ -10,4 +10,4 @@ none
 
 Exports:
 
-- `componentized:secrets/store@0.1.0`
+- `componentized:secrets/store@0.1.1-dev`

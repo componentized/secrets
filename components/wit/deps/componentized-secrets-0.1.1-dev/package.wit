@@ -1,5 +1,5 @@
 /// Secrets for components, sensitive values looked up by key.
-package componentized:secrets@0.1.0;
+package componentized:secrets@0.1.1-dev;
 
 /// A store of secrets, sensitive values looked up by key, e.g. passwords, tokens and keys.
 @since(version = 0.1.0)

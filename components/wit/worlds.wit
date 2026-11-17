@@ -1,17 +1,17 @@
 package componentized:secrets-components;
 
 world empty {
-    export componentized:secrets/store@0.1.0;
+    export componentized:secrets/store@0.1.1-dev;
 }
 
 world from-config {
     import wasi:config/store@0.2.0-rc.1;
-    export componentized:secrets/store@0.1.0;
+    export componentized:secrets/store@0.1.1-dev;
 }
 
 /// Calls a `componentized:secrets/store` the way a consumer does, for the tests of each component.
 interface probe {
-    use componentized:secrets/store@0.1.0.{error-code, secret};
+    use componentized:secrets/store@0.1.1-dev.{error-code, secret};
 
     /// A call to `store.init`.
     record init-call {
@@ -29,6 +29,6 @@ interface probe {
 }
 
 world test-consumer {
-    import componentized:secrets/store@0.1.0;
+    import componentized:secrets/store@0.1.1-dev;
     export probe;
 }
