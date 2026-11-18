@@ -9,7 +9,8 @@ use componentized::secrets::latch::{
     self, Decision, ErrorCode as LatchErrorCode, GetArgs, Operation, StoreOperation,
 };
 use componentized::secrets::store;
-use exports::componentized::secrets::store::{ErrorCode, Guest as StoreGuest, Secret};
+use componentized::secrets::types::{ErrorCode, Secret};
+use exports::componentized::secrets::store::Guest as StoreGuest;
 use wasi::logging::logging::{Level, log};
 
 const CONTEXT: &str = "componentized-gate";
@@ -49,17 +50,13 @@ impl StoreGuest for Component {
     }
 
     fn get(key: String) -> Result<Secret, ErrorCode> {
-        let call_summary = || {
-            format!(
-                "OPERATION=componentized:secrets/store#get KEY={key}"
-            )
-        };
+        let call_summary = || format!("OPERATION=componentized:secrets/store#get KEY={key}");
 
         match authorize(&Operation::Store(StoreOperation::Get(GetArgs {
             key: key.clone(),
         }))) {
             Ok(Decision::Denied(reason)) => {
-                warn!( 
+                warn!(
                     "Denied REASON={} {}",
                     DisplayReason(&reason),
                     call_summary()

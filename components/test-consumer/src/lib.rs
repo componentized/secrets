@@ -15,8 +15,14 @@ impl ProbeGuest for Component {
         let mut call = pin!(store::init());
         let first = poll_fn(|cx| Poll::Ready(call.as_mut().poll(cx))).await;
         match first {
-            Poll::Ready(result) => InitCall { immediate: true, result },
-            Poll::Pending => InitCall { immediate: false, result: call.await },
+            Poll::Ready(result) => InitCall {
+                immediate: true,
+                result,
+            },
+            Poll::Pending => InitCall {
+                immediate: false,
+                result: call.await,
+            },
         }
     }
 

@@ -4,6 +4,6 @@ package componentized:test-gate;
 
 let secrets = new local:from-config { ... };
 let gate = new local:gate { store: secrets.store, ... };
-let consumer = new local:test-consumer { store: gate.store };
+let consumer = new local:test-consumer { types: gate.types, store: gate.store };
 
 export consumer.probe;

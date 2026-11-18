@@ -92,7 +92,12 @@ pub struct FakeLatch {
 
 impl Default for FakeLatch {
     fn default() -> Self {
-        Self { authorize: Ok(Decision::Deferred), observe: Ok(()), authorized: Vec::new(), observed: Vec::new() }
+        Self {
+            authorize: Ok(Decision::Deferred),
+            observe: Ok(()),
+            authorized: Vec::new(),
+            observed: Vec::new(),
+        }
     }
 }
 
@@ -103,13 +108,19 @@ impl bindings::wasi::config::store::Host for Host {
 
     fn get_all(&mut self) -> Result<Vec<(String, String)>, ConfigError> {
         self.get_all_calls += 1;
-        self.config.clone().map(|config| config.into_iter().collect())
+        self.config
+            .clone()
+            .map(|config| config.into_iter().collect())
     }
 }
 
 impl bindings::wasi::logging::logging::Host for Host {
     fn log(&mut self, level: Level, context: String, message: String) {
-        self.logs.push(Log { level, context, message });
+        self.logs.push(Log {
+            level,
+            context,
+            message,
+        });
     }
 }
 
@@ -137,7 +148,11 @@ impl<const I: usize> bindings::componentized::secrets::latch::Host for FakeLatch
         latch.authorize.clone()
     }
 
-    fn observe_decision(&mut self, final_decision: Decision, operation: Operation) -> Result<(), LatchError> {
+    fn observe_decision(
+        &mut self,
+        final_decision: Decision,
+        operation: Operation,
+    ) -> Result<(), LatchError> {
         let latch = self.latch("observe-decision");
         latch.observed.push((final_decision, operation));
         latch.observe.clone()
@@ -160,7 +175,9 @@ fn add_fake_latch<const I: usize>(linker: &mut Linker<Host>, name: &str) -> wasm
 
 /// The operation to get the secret of the key.
 pub fn get(key: &str) -> Operation {
-    Operation::Store(StoreOperation::Get(GetArgs { key: key.to_string() }))
+    Operation::Store(StoreOperation::Get(GetArgs {
+        key: key.to_string(),
+    }))
 }
 
 /// Builds the component with `make components/<component>`, so a test run on its own, e.g. with
@@ -201,7 +218,10 @@ fn build(root: &Path, component: &str) -> wasmtime::Result<()> {
 /// Instantiates the release build of the component from target/components, built first, see
 /// [`build`]. Imports the host doesn't provide trap when called, e.g. the types-only
 /// `componentized:secrets/store` a composition with a gate imports for its latch.
-async fn instantiate(component: &str, host: Host) -> wasmtime::Result<(Store<Host>, InstancePre<Host>, Instance)> {
+async fn instantiate(
+    component: &str,
+    host: Host,
+) -> wasmtime::Result<(Store<Host>, InstancePre<Host>, Instance)> {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
     build(&root, component)?;
     let mut config = Config::new();
@@ -209,8 +229,12 @@ async fn instantiate(component: &str, host: Host) -> wasmtime::Result<(Store<Hos
     // the named latch imports of a `latch-n`, e.g. `import latch0: componentized:secrets/latch`
     config.wasm_component_model_implements(true);
     let engine = Engine::new(&config)?;
-    let path = root.join("target/components").join(component).join(format!("{component}.wasm"));
-    let wasm = Component::from_file(&engine, &path).map_err(|err| err.context(path.display().to_string()))?;
+    let path = root
+        .join("target/components")
+        .join(component)
+        .join(format!("{component}.wasm"));
+    let wasm = Component::from_file(&engine, &path)
+        .map_err(|err| err.context(path.display().to_string()))?;
     let mut linker = Linker::new(&engine);
     bindings::wasi::config::store::add_to_linker::<_, HasSelf<Host>>(&mut linker, |host| host)?;
     bindings::wasi::logging::logging::add_to_linker::<_, HasSelf<Host>>(&mut linker, |host| host)?;
@@ -236,15 +260,18 @@ pub struct Consumer {
 impl Consumer {
     pub async fn new(composition: &str, host: Host) -> wasmtime::Result<Self> {
         let (mut store, pre, instance) = instantiate(composition, host).await?;
-        let probe = bindings::exports::componentized::secrets_components::probe::GuestIndices::new(&pre)?
-            .load(&mut store, &instance)?;
+        let probe =
+            bindings::exports::componentized::secrets_components::probe::GuestIndices::new(&pre)?
+                .load(&mut store, &instance)?;
         Ok(Self { store, probe })
     }
 
     /// Calls `store.init` through the consumer.
     pub async fn init(&mut self) -> wasmtime::Result<InitCall> {
         let probe = self.probe.clone();
-        self.store.run_concurrent(async |accessor| probe.call_init(accessor).await).await?
+        self.store
+            .run_concurrent(async |accessor| probe.call_init(accessor).await)
+            .await?
     }
 
     /// Calls `store.init` through the consumer twice, at the same time.
@@ -252,7 +279,8 @@ impl Consumer {
         let probe = self.probe.clone();
         self.store
             .run_concurrent(async |accessor| {
-                let (first, second) = tokio::join!(probe.call_init(accessor), probe.call_init(accessor));
+                let (first, second) =
+                    tokio::join!(probe.call_init(accessor), probe.call_init(accessor));
                 Ok((first?, second?))
             })
             .await?
@@ -279,8 +307,13 @@ impl Latch {
     }
 
     /// Calls `authorize` to get the secret of the key.
-    pub async fn authorize_get(&mut self, key: &str) -> wasmtime::Result<Result<exported::Decision, exported::LatchError>> {
-        self.latch.call_authorize(&mut self.store, &exported_get(key)).await
+    pub async fn authorize_get(
+        &mut self,
+        key: &str,
+    ) -> wasmtime::Result<Result<exported::Decision, exported::LatchError>> {
+        self.latch
+            .call_authorize(&mut self.store, &exported_get(key))
+            .await
     }
 
     /// Calls `observe-decision` for getting the secret of the key.
@@ -289,10 +322,14 @@ impl Latch {
         decision: &exported::Decision,
         key: &str,
     ) -> wasmtime::Result<Result<(), exported::LatchError>> {
-        self.latch.call_observe_decision(&mut self.store, decision, &exported_get(key)).await
+        self.latch
+            .call_observe_decision(&mut self.store, decision, &exported_get(key))
+            .await
     }
 }
 
 fn exported_get(key: &str) -> exported::Operation {
-    exported::Operation::Store(exported::StoreOperation::Get(exported::GetArgs { key: key.to_string() }))
+    exported::Operation::Store(exported::StoreOperation::Get(exported::GetArgs {
+        key: key.to_string(),
+    }))
 }

@@ -1,0 +1,27 @@
+@since(version = 0.1.1-dev)
+interface types {
+
+    /// The value of a secret.
+    @since(version = 0.1.1-dev)
+    variant secret {
+        /// A secret that is text.
+        %string(string),
+        /// A secret that is binary.
+        /// 
+        /// Encoded text is discouraged, favor a string.
+        bytes(list<u8>),
+    }
+
+    /// An error getting a secret.
+    @since(version = 0.1.1-dev)
+    variant error-code {
+        /// The store is not initialized, call `init()` first.
+        not-initialized,
+        /// The store has no secret for the key.
+        not-found,
+        /// Any other error, e.g. the store is unavailable or access to the secret is denied, with
+        /// a message describing the error, when there is one.
+        other(option<string>),
+    }
+
+}

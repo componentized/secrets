@@ -3,9 +3,8 @@
 
 use std::sync::OnceLock;
 
-use componentized::secrets::store::ErrorCode as StoreErrorCode;
 use exports::componentized::secrets::latch::{
-    Decision, ErrorCode, GetArgs, Guest as LatchGuest, Operation, StoreOperation,
+    Decision, ErrorCode, GetArgs, Guest as LatchGuest, Operation, StoreErrorCode, StoreOperation,
 };
 use wasi::config::store as config;
 use wasi::logging::logging::{Level, log};
@@ -16,7 +15,10 @@ struct Component;
 
 impl LatchGuest for Component {
     fn authorize(operation: Operation) -> Result<Decision, ErrorCode> {
-        let rules = RULES.get_or_init(load_rules).as_ref().map_err(Clone::clone)?;
+        let rules = RULES
+            .get_or_init(load_rules)
+            .as_ref()
+            .map_err(Clone::clone)?;
         let Operation::Store(StoreOperation::Get(GetArgs { key })) = &operation;
         Ok(match decide(rules, key) {
             true => Decision::Denied(StoreErrorCode::NotFound),
@@ -51,8 +53,14 @@ fn load_rules() -> Result<Vec<Rule>, ErrorCode> {
             entries
                 .into_iter()
                 .map(|(pattern, value)| match value.as_str() {
-                    "" | "deferred" => Ok(Rule { pattern, denied: false }),
-                    "denied" => Ok(Rule { pattern, denied: true }),
+                    "" | "deferred" => Ok(Rule {
+                        pattern,
+                        denied: false,
+                    }),
+                    "denied" => Ok(Rule {
+                        pattern,
+                        denied: true,
+                    }),
                     _ => Err(format!(
                         "KEY={pattern} VALUE={value} ERROR=expected one of: 'deferred', 'denied'"
                     )),
@@ -60,7 +68,11 @@ fn load_rules() -> Result<Vec<Rule>, ErrorCode> {
                 .collect()
         })
         .map_err(|message| {
-            log(Level::Critical, "componentized-latch", &format!("Invalid config LATCH={LATCH_NAME} {message}"));
+            log(
+                Level::Critical,
+                "componentized-latch",
+                &format!("Invalid config LATCH={LATCH_NAME} {message}"),
+            );
             ErrorCode::InvalidConfig(LATCH_NAME.to_string())
         })
 }
@@ -136,7 +148,10 @@ mod tests {
     fn rules(rules: &[(&str, bool)]) -> Vec<Rule> {
         rules
             .iter()
-            .map(|(pattern, denied)| Rule { pattern: pattern.to_string(), denied: *denied })
+            .map(|(pattern, denied)| Rule {
+                pattern: pattern.to_string(),
+                denied: *denied,
+            })
             .collect()
     }
 

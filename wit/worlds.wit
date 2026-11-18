@@ -11,6 +11,8 @@ world provider {
 /// The interfaces to import to use secrets.
 @since(version = 0.1.0)
 world imports {
+    @since(version = 0.1.1-dev)
+    import types;
     @since(version = 0.1.0)
     import store;
     @since(version = 0.1.1-dev)
