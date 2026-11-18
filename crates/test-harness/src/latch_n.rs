@@ -14,7 +14,11 @@ fn denied(i: usize) -> ErrorCode {
 
 pub async fn deferred_when_every_latch_defers(component: &str, n: usize) {
     let mut latch = Latch::new(component, Host::default()).await.unwrap();
-    assert_eq!(latch.authorize_get("password").await.unwrap(), Ok(exported::Decision::Deferred), "{component}");
+    assert_eq!(
+        latch.authorize_get("password").await.unwrap(),
+        Ok(exported::Decision::Deferred),
+        "{component}"
+    );
     let host = latch.store.data();
     assert_eq!(host.latch_calls, calls("authorize", n), "{component}");
     for fake in &host.latches[..n] {
@@ -36,7 +40,11 @@ pub async fn first_denial_is_the_decision(component: &str, n: usize) {
             "{component} latch{denying}"
         );
         // the latches after the denial are not asked
-        assert_eq!(latch.store.data().latch_calls, calls("authorize", denying + 1), "{component} latch{denying}");
+        assert_eq!(
+            latch.store.data().latch_calls,
+            calls("authorize", denying + 1),
+            "{component} latch{denying}"
+        );
     }
 }
 
@@ -47,41 +55,74 @@ pub async fn authorize_error_is_returned(component: &str, n: usize) {
         let mut latch = Latch::new(component, host).await.unwrap();
         assert_eq!(
             latch.authorize_get("password").await.unwrap(),
-            Err(exported::LatchError::InvalidConfig(format!("latch{failing}"))),
+            Err(exported::LatchError::InvalidConfig(format!(
+                "latch{failing}"
+            ))),
             "{component} latch{failing}"
         );
-        assert_eq!(latch.store.data().latch_calls, calls("authorize", failing + 1), "{component} latch{failing}");
+        assert_eq!(
+            latch.store.data().latch_calls,
+            calls("authorize", failing + 1),
+            "{component} latch{failing}"
+        );
     }
 }
 
 pub async fn every_latch_observes_the_final_decision(component: &str, n: usize) {
-    for decision in [exported::Decision::Deferred, exported::Decision::Denied(ErrorCode::NotFound)] {
+    for decision in [
+        exported::Decision::Deferred,
+        exported::Decision::Denied(ErrorCode::NotFound),
+    ] {
         let mut latch = Latch::new(component, Host::default()).await.unwrap();
-        assert_eq!(latch.observe_get(&decision, "password").await.unwrap(), Ok(()), "{component}");
+        assert_eq!(
+            latch.observe_get(&decision, "password").await.unwrap(),
+            Ok(()),
+            "{component}"
+        );
         let host = latch.store.data();
-        assert_eq!(host.latch_calls, calls("observe-decision", n), "{component}");
+        assert_eq!(
+            host.latch_calls,
+            calls("observe-decision", n),
+            "{component}"
+        );
         let expected = match &decision {
             exported::Decision::Deferred => Decision::Deferred,
             exported::Decision::Denied(reason) => Decision::Denied(reason.clone()),
         };
         for fake in &host.latches[..n] {
-            assert_eq!(fake.observed, vec![(expected.clone(), get("password"))], "{component}");
+            assert_eq!(
+                fake.observed,
+                vec![(expected.clone(), get("password"))],
+                "{component}"
+            );
         }
     }
 }
 
-pub async fn first_observation_failure_is_returned_after_every_latch_observes(component: &str, n: usize) {
+pub async fn first_observation_failure_is_returned_after_every_latch_observes(
+    component: &str,
+    n: usize,
+) {
     let mut host = Host::default();
     for i in 0..n {
         host.latches[i].observe = Err(LatchError::ObservationFailed(format!("latch{i}")));
     }
     let mut latch = Latch::new(component, host).await.unwrap();
     assert_eq!(
-        latch.observe_get(&exported::Decision::Deferred, "password").await.unwrap(),
-        Err(exported::LatchError::ObservationFailed("latch0".to_string())),
+        latch
+            .observe_get(&exported::Decision::Deferred, "password")
+            .await
+            .unwrap(),
+        Err(exported::LatchError::ObservationFailed(
+            "latch0".to_string()
+        )),
         "{component}"
     );
-    assert_eq!(latch.store.data().latch_calls, calls("observe-decision", n), "{component}");
+    assert_eq!(
+        latch.store.data().latch_calls,
+        calls("observe-decision", n),
+        "{component}"
+    );
 }
 
 /// The tests of a `latch-n` component that aggregates `n` latches, e.g.
@@ -107,7 +148,10 @@ macro_rules! latch_n_tests {
         }
         #[tokio::test]
         async fn first_observation_failure_is_returned_after_every_latch_observes() {
-            $crate::latch_n::first_observation_failure_is_returned_after_every_latch_observes($component, $n).await;
+            $crate::latch_n::first_observation_failure_is_returned_after_every_latch_observes(
+                $component, $n,
+            )
+            .await;
         }
     };
 }

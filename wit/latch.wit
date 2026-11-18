@@ -12,7 +12,7 @@
 @since(version = 0.1.1-dev)
 interface latch {
     @since(version = 0.1.1-dev)
-    use store.{error-code as store-error-code};
+    use types.{error-code as store-error-code};
 
     /// Arguments to componentized:secrets/store#get.
     @since(version = 0.1.1-dev)

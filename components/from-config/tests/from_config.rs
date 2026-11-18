@@ -5,17 +5,31 @@ use std::collections::HashMap;
 use test_harness::{ConfigError, Consumer, ErrorCode, Host, Secret};
 
 async fn consumer(config: Result<HashMap<String, String>, ConfigError>) -> Consumer {
-    Consumer::new("test-from-config", Host { config, ..Host::default() }).await.unwrap()
+    Consumer::new(
+        "test-from-config",
+        Host {
+            config,
+            ..Host::default()
+        },
+    )
+    .await
+    .unwrap()
 }
 
 fn config() -> Result<HashMap<String, String>, ConfigError> {
-    Ok(HashMap::from([("password".to_string(), "hunter2".to_string())]))
+    Ok(HashMap::from([(
+        "password".to_string(),
+        "hunter2".to_string(),
+    )]))
 }
 
 #[tokio::test]
 async fn get_before_init_is_not_initialized() {
     let mut consumer = consumer(config()).await;
-    assert!(matches!(consumer.get("password").await.unwrap(), Err(ErrorCode::NotInitialized)));
+    assert!(matches!(
+        consumer.get("password").await.unwrap(),
+        Err(ErrorCode::NotInitialized)
+    ));
 }
 
 #[tokio::test]
@@ -31,7 +45,10 @@ async fn init_after_init_resolves_immediately() {
     let mut consumer = consumer(config()).await;
     consumer.init().await.unwrap();
     let call = consumer.init().await.unwrap();
-    assert!(call.immediate, "an init after the store is initialized waited");
+    assert!(
+        call.immediate,
+        "an init after the store is initialized waited"
+    );
     assert!(call.result.is_ok());
     assert_eq!(consumer.store.data().get_all_calls, 1);
 }
@@ -59,14 +76,20 @@ async fn get_is_the_config_value() {
 async fn get_missing_key_is_not_found() {
     let mut consumer = consumer(config()).await;
     consumer.init().await.unwrap();
-    assert!(matches!(consumer.get("missing").await.unwrap(), Err(ErrorCode::NotFound)));
+    assert!(matches!(
+        consumer.get("missing").await.unwrap(),
+        Err(ErrorCode::NotFound)
+    ));
 }
 
 #[tokio::test]
 async fn config_changed_after_init_is_not_seen() {
     let mut consumer = consumer(config()).await;
     consumer.init().await.unwrap();
-    consumer.store.data_mut().config = Ok(HashMap::from([("password".to_string(), "changed".to_string())]));
+    consumer.store.data_mut().config = Ok(HashMap::from([(
+        "password".to_string(),
+        "changed".to_string(),
+    )]));
     assert!(matches!(
         consumer.get("password").await.unwrap(),
         Ok(Secret::String(value)) if value == "hunter2"
@@ -81,7 +104,10 @@ async fn config_error_fails_init() {
         call.result,
         Err(ErrorCode::Other(Some(message))) if message == "upstream: unavailable"
     ));
-    assert!(matches!(consumer.get("password").await.unwrap(), Err(ErrorCode::NotInitialized)));
+    assert!(matches!(
+        consumer.get("password").await.unwrap(),
+        Err(ErrorCode::NotInitialized)
+    ));
 }
 
 #[tokio::test]

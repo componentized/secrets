@@ -1,22 +1,29 @@
 package componentized:secrets-components;
 
 world empty {
+    import componentized:secrets/types@0.1.1-dev;
     export componentized:secrets/store@0.1.1-dev;
+    export componentized:secrets/types@0.1.1-dev;
 }
 
 world from-config {
+    import componentized:secrets/types@0.1.1-dev;
     import wasi:config/store@0.2.0-rc.1;
+    export componentized:secrets/types@0.1.1-dev;
     export componentized:secrets/store@0.1.1-dev;
 }
 
 world gate {
+    import componentized:secrets/types@0.1.1-dev;
     import componentized:secrets/latch@0.1.1-dev;
     import wasi:logging/logging@0.1.0-draft;
     import componentized:secrets/store@0.1.1-dev;
+    export componentized:secrets/types@0.1.1-dev;
     export componentized:secrets/store@0.1.1-dev;
 }
 
 world latch {
+    import componentized:secrets/types@0.1.1-dev;
     import wasi:config/store@0.2.0-rc.1;
     import wasi:logging/logging@0.1.0-draft;
     export componentized:secrets/latch@0.1.1-dev;
@@ -25,6 +32,7 @@ world latch {
 /// Aggregates the latches it imports into one, the `latch-n` components each use the first of them,
 /// e.g. `latch-n2` uses `latch0` and `latch1`.
 world latch-n {
+    import componentized:secrets/types@0.1.1-dev;
     export componentized:secrets/latch@0.1.1-dev;
     import latch0: componentized:secrets/latch@0.1.1-dev;
     import latch1: componentized:secrets/latch@0.1.1-dev;

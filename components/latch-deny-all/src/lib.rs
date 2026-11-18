@@ -1,7 +1,8 @@
 //! `componentized:secrets` latch that denies every operation with `not-found`, allowing no secrets.
 
-use componentized::secrets::store::ErrorCode as StoreErrorCode;
-use exports::componentized::secrets::latch::{Decision, ErrorCode, Guest as LatchGuest, Operation};
+use exports::componentized::secrets::latch::{
+    Decision, ErrorCode, Guest as LatchGuest, Operation, StoreErrorCode,
+};
 
 struct Component;
 
