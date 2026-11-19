@@ -20,10 +20,10 @@ Latch error CODE=invalid-config<latch-key> OPERATION=componentized:secrets/store
 
 Imports:
 
-- `componentized:secrets/latch@0.1.1`: decides whether each `get` may proceed
+- `componentized:secrets/latch@0.1.2-dev`: decides whether each `get` may proceed
 - `wasi:logging/logging@0.1.0-draft`: logs denials and latch errors
-- `componentized:secrets/store@0.1.1`: the store the gated store wraps
+- `componentized:secrets/store@0.1.2-dev`: the store the gated store wraps
 
 Exports:
 
-- `componentized:secrets/store@0.1.1`: store gated by the latch
+- `componentized:secrets/store@0.1.2-dev`: store gated by the latch

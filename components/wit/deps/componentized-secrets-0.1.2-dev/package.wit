@@ -1,5 +1,5 @@
 /// Secrets for components, sensitive values looked up by key.
-package componentized:secrets@0.1.1;
+package componentized:secrets@0.1.2-dev;
 
 @since(version = 0.1.1)
 interface types {

@@ -28,8 +28,8 @@ Imports:
 
 - `wasi:config/store@0.2.0-rc.1`: the decision for each pattern of keys
 - `wasi:logging/logging@0.1.0-draft`: logs an invalid config
-- `componentized:secrets/store@0.1.1`: the types of the operations being authorized
+- `componentized:secrets/store@0.1.2-dev`: the types of the operations being authorized
 
 Exports:
 
-- `componentized:secrets/latch@0.1.1`: the latch
+- `componentized:secrets/latch@0.1.2-dev`: the latch
