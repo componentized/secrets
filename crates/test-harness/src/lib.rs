@@ -238,7 +238,7 @@ async fn instantiate(
     let mut linker = Linker::new(&engine);
     bindings::wasi::config::store::add_to_linker::<_, HasSelf<Host>>(&mut linker, |host| host)?;
     bindings::wasi::logging::logging::add_to_linker::<_, HasSelf<Host>>(&mut linker, |host| host)?;
-    add_fake_latch::<GATE_LATCH>(&mut linker, "componentized:secrets/latch@0.1.1-dev")?;
+    add_fake_latch::<GATE_LATCH>(&mut linker, "componentized:secrets/latch@0.1.1")?;
     add_fake_latch::<0>(&mut linker, "latch0")?;
     add_fake_latch::<1>(&mut linker, "latch1")?;
     add_fake_latch::<2>(&mut linker, "latch2")?;

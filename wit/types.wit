@@ -1,8 +1,8 @@
-@since(version = 0.1.1-dev)
+@since(version = 0.1.1)
 interface types {
 
     /// The value of a secret.
-    @since(version = 0.1.1-dev)
+    @since(version = 0.1.1)
     variant secret {
         /// A secret that is text.
         %string(string),
@@ -13,7 +13,7 @@ interface types {
     }
 
     /// An error getting a secret.
-    @since(version = 0.1.1-dev)
+    @since(version = 0.1.1)
     variant error-code {
         /// The store is not initialized, call `init()` first.
         not-initialized,

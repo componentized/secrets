@@ -13,4 +13,4 @@ Imports:
 
 Exports:
 
-- `componentized:secrets/store@0.1.1-dev`
+- `componentized:secrets/store@0.1.1`

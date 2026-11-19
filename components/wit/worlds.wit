@@ -1,49 +1,49 @@
 package componentized:secrets-components;
 
 world empty {
-    import componentized:secrets/types@0.1.1-dev;
-    export componentized:secrets/store@0.1.1-dev;
-    export componentized:secrets/types@0.1.1-dev;
+    import componentized:secrets/types@0.1.1;
+    export componentized:secrets/store@0.1.1;
+    export componentized:secrets/types@0.1.1;
 }
 
 world from-config {
-    import componentized:secrets/types@0.1.1-dev;
+    import componentized:secrets/types@0.1.1;
     import wasi:config/store@0.2.0-rc.1;
-    export componentized:secrets/types@0.1.1-dev;
-    export componentized:secrets/store@0.1.1-dev;
+    export componentized:secrets/types@0.1.1;
+    export componentized:secrets/store@0.1.1;
 }
 
 world gate {
-    import componentized:secrets/types@0.1.1-dev;
-    import componentized:secrets/latch@0.1.1-dev;
+    import componentized:secrets/types@0.1.1;
+    import componentized:secrets/latch@0.1.1;
     import wasi:logging/logging@0.1.0-draft;
-    import componentized:secrets/store@0.1.1-dev;
-    export componentized:secrets/types@0.1.1-dev;
-    export componentized:secrets/store@0.1.1-dev;
+    import componentized:secrets/store@0.1.1;
+    export componentized:secrets/types@0.1.1;
+    export componentized:secrets/store@0.1.1;
 }
 
 world latch {
-    import componentized:secrets/types@0.1.1-dev;
+    import componentized:secrets/types@0.1.1;
     import wasi:config/store@0.2.0-rc.1;
     import wasi:logging/logging@0.1.0-draft;
-    export componentized:secrets/latch@0.1.1-dev;
+    export componentized:secrets/latch@0.1.1;
 }
 
 /// Aggregates the latches it imports into one, the `latch-n` components each use the first of them,
 /// e.g. `latch-n2` uses `latch0` and `latch1`.
 world latch-n {
-    import componentized:secrets/types@0.1.1-dev;
-    export componentized:secrets/latch@0.1.1-dev;
-    import latch0: componentized:secrets/latch@0.1.1-dev;
-    import latch1: componentized:secrets/latch@0.1.1-dev;
-    import latch2: componentized:secrets/latch@0.1.1-dev;
-    import latch3: componentized:secrets/latch@0.1.1-dev;
-    import latch4: componentized:secrets/latch@0.1.1-dev;
+    import componentized:secrets/types@0.1.1;
+    export componentized:secrets/latch@0.1.1;
+    import latch0: componentized:secrets/latch@0.1.1;
+    import latch1: componentized:secrets/latch@0.1.1;
+    import latch2: componentized:secrets/latch@0.1.1;
+    import latch3: componentized:secrets/latch@0.1.1;
+    import latch4: componentized:secrets/latch@0.1.1;
 }
 
 /// Calls a `componentized:secrets/store` the way a consumer does, for the tests of each component.
 interface probe {
-    use componentized:secrets/store@0.1.1-dev.{error-code, secret};
+    use componentized:secrets/store@0.1.1.{error-code, secret};
 
     /// A call to `store.init`.
     record init-call {
@@ -61,7 +61,7 @@ interface probe {
 }
 
 world test-consumer {
-    import componentized:secrets/store@0.1.1-dev;
+    import componentized:secrets/store@0.1.1;
     export probe;
 }
 
@@ -69,13 +69,13 @@ world test-consumer {
 /// and calls the latches and the probe. The host provides the latch a gate imports, as well as the
 /// named latches a `latch-n` imports.
 world test-host {
-    import latch0: componentized:secrets/latch@0.1.1-dev;
-    import latch1: componentized:secrets/latch@0.1.1-dev;
-    import latch2: componentized:secrets/latch@0.1.1-dev;
-    import latch3: componentized:secrets/latch@0.1.1-dev;
-    import latch4: componentized:secrets/latch@0.1.1-dev;
+    import latch0: componentized:secrets/latch@0.1.1;
+    import latch1: componentized:secrets/latch@0.1.1;
+    import latch2: componentized:secrets/latch@0.1.1;
+    import latch3: componentized:secrets/latch@0.1.1;
+    import latch4: componentized:secrets/latch@0.1.1;
     import wasi:config/store@0.2.0-rc.1;
     import wasi:logging/logging@0.1.0-draft;
-    export componentized:secrets/latch@0.1.1-dev;
+    export componentized:secrets/latch@0.1.1;
     export probe;
 }

@@ -8,12 +8,12 @@ The latches are asked in order, `latch0`, `latch1`, `latch2`, `latch3`, and the 
 
 Imports:
 
-- `latch0`: `componentized:secrets/latch@0.1.1-dev`, a latch to aggregate
-- `latch1`: `componentized:secrets/latch@0.1.1-dev`, a latch to aggregate
-- `latch2`: `componentized:secrets/latch@0.1.1-dev`, a latch to aggregate
-- `latch3`: `componentized:secrets/latch@0.1.1-dev`, a latch to aggregate
-- `componentized:secrets/store@0.1.1-dev`: the types of the operations being authorized
+- `latch0`: `componentized:secrets/latch@0.1.1`, a latch to aggregate
+- `latch1`: `componentized:secrets/latch@0.1.1`, a latch to aggregate
+- `latch2`: `componentized:secrets/latch@0.1.1`, a latch to aggregate
+- `latch3`: `componentized:secrets/latch@0.1.1`, a latch to aggregate
+- `componentized:secrets/store@0.1.1`: the types of the operations being authorized
 
 Exports:
 
-- `componentized:secrets/latch@0.1.1-dev`: the latch
+- `componentized:secrets/latch@0.1.1`: the latch

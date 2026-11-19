@@ -6,7 +6,7 @@ A consumer of `componentized:secrets`, plugged into each component for its tests
 
 Imports:
 
-- `componentized:secrets/store@0.1.1-dev`: the store under test
+- `componentized:secrets/store@0.1.1`: the store under test
 
 Exports:
 
