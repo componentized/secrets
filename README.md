@@ -17,6 +17,10 @@ A collection of utility components for sensitive values.
 - [`empty`](./components/empty/)
 - [`from-config`](./components/from-config/)
 
+Adapters, a store for consumers of other interfaces:
+
+- [`to-wasmcloud`](./components/to-wasmcloud/), `wasmcloud:secrets` for a store
+
 Access control, a [`gate`](./components/gate/) consults a latch before each `get`, see [`latch.wit`](./wit/latch.wit):
 
 - [`gate`](./components/gate/)
@@ -43,7 +47,7 @@ To test the components:
 make test
 ```
 
-Each store is plugged into [`test-consumer`](./components/test-consumer/), which calls the store the way a consumer does, e.g. [`test-empty`](./components/test-empty/), and each component's tests, in its `tests` directory, run the composition with wasmtime, with the [`test-harness`](./crates/test-harness/). The `gate` is tested between the consumer and a store, [`test-gate`](./components/test-gate/), with a latch the tests provide. The latches are called by the tests directly.
+Each store is plugged into [`test-consumer`](./components/test-consumer/), which calls the store the way a consumer does, e.g. [`test-empty`](./components/test-empty/), and each component's tests, in its `tests` directory, run the composition with wasmtime, with the [`test-harness`](./crates/test-harness/). The `gate` is tested between the consumer and a store, [`test-gate`](./components/test-gate/), with a latch the tests provide. The latches are called by the tests directly. `to-wasmcloud` is plugged with `from-config`, [`test-to-wasmcloud`](./components/test-to-wasmcloud/), and its tests call `wasmcloud:secrets` directly.
 
 ## Community
 

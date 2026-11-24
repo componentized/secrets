@@ -1,6 +1,7 @@
 //! The harness of the components' tests, in each component's `tests` directory. Runs a component
 //! with wasmtime, as the host of the `test-host` world: a composition of `test-consumer` through
-//! its probe, see `components/test-consumer`, or a latch directly.
+//! its probe, see `components/test-consumer`, a latch directly, or a composition that exports
+//! `wasmcloud:secrets`, e.g. `test-to-wasmcloud`.
 //!
 //! Each store is plugged into `test-consumer`, which calls the store as a consumer does, e.g.
 //! `test-empty`. The gate is tested between the consumer and a store, `test-gate`, with a latch the
@@ -13,7 +14,9 @@ use std::path::Path;
 use std::process::Command;
 use std::sync::{Mutex, PoisonError};
 
-use wasmtime::component::{Component, HasData, HasSelf, Instance, InstancePre, Linker};
+use wasmtime::component::{
+    Accessor, Component, HasData, HasSelf, Instance, InstancePre, Linker, ResourceAny,
+};
 use wasmtime::{Config, Engine, Store};
 
 pub use bindings::componentized::secrets::latch::{
@@ -23,6 +26,11 @@ pub use bindings::componentized::secrets::store::{ErrorCode, Secret};
 pub use bindings::exports::componentized::secrets_components::probe::InitCall;
 pub use bindings::wasi::config::store::Error as ConfigError;
 pub use bindings::wasi::logging::logging::Level;
+
+/// The `wasmcloud:secrets` a composition exports, e.g. `test-to-wasmcloud`.
+pub mod wasmcloud {
+    pub use super::bindings::exports::wasmcloud::secrets::store::{SecretValue, SecretsError};
+}
 
 /// The latch a latch component exports, its types are distinct from the latch the host provides.
 pub mod exported {
@@ -332,4 +340,90 @@ fn exported_get(key: &str) -> exported::Operation {
     exported::Operation::Store(exported::StoreOperation::Get(exported::GetArgs {
         key: key.to_string(),
     }))
+}
+
+/// An instance of a composition that exports `wasmcloud:secrets`, e.g. `test-to-wasmcloud`.
+pub struct Wasmcloud {
+    pub store: Store<Host>,
+    secrets: WasmcloudGuest,
+}
+
+/// The `wasmcloud:secrets` interfaces an instance exports.
+#[derive(Clone)]
+struct WasmcloudGuest {
+    store: bindings::exports::wasmcloud::secrets::store::Guest,
+    reveal: bindings::exports::wasmcloud::secrets::reveal::Guest,
+}
+
+/// The value of a secret got with `store.get` and revealed, or the error getting it.
+pub type WasmcloudResult = Result<wasmcloud::SecretValue, wasmcloud::SecretsError>;
+
+impl WasmcloudGuest {
+    /// Calls `store.get`, then `reveal` with the secret, returned to be dropped after.
+    async fn get_and_reveal(
+        &self,
+        accessor: &Accessor<Host>,
+        key: String,
+    ) -> wasmtime::Result<(Option<ResourceAny>, WasmcloudResult)> {
+        let secret = match self.store.call_get(accessor, key).await? {
+            Ok(secret) => secret,
+            Err(err) => return Ok((None, Err(err))),
+        };
+        let value = self.reveal.call_reveal(accessor, secret).await?;
+        Ok((Some(secret), Ok(value)))
+    }
+}
+
+impl Wasmcloud {
+    pub async fn new(composition: &str, host: Host) -> wasmtime::Result<Self> {
+        let (mut store, pre, instance) = instantiate(composition, host).await?;
+        let secrets = WasmcloudGuest {
+            store: bindings::exports::wasmcloud::secrets::store::GuestIndices::new(&pre)?
+                .load(&mut store, &instance)?,
+            reveal: bindings::exports::wasmcloud::secrets::reveal::GuestIndices::new(&pre)?
+                .load(&mut store, &instance)?,
+        };
+        Ok(Self { store, secrets })
+    }
+
+    /// Calls `store.get`, then `reveal` with the secret it returns, dropping the secret after.
+    pub async fn get(&mut self, key: &str) -> wasmtime::Result<WasmcloudResult> {
+        let (secrets, key) = (self.secrets.clone(), key.to_string());
+        let (secret, result) = self
+            .store
+            .run_concurrent(async move |accessor| secrets.get_and_reveal(accessor, key).await)
+            .await??;
+        self.drop_secret(secret).await?;
+        Ok(result)
+    }
+
+    /// Calls `store.get` twice, at the same time, then `reveal` with each secret.
+    pub async fn get_concurrently(
+        &mut self,
+        first: &str,
+        second: &str,
+    ) -> wasmtime::Result<(WasmcloudResult, WasmcloudResult)> {
+        let secrets = self.secrets.clone();
+        let (first, second) = (first.to_string(), second.to_string());
+        let ((first_secret, first), (second_secret, second)) = self
+            .store
+            .run_concurrent(async move |accessor| {
+                let (first, second) = tokio::join!(
+                    secrets.get_and_reveal(accessor, first),
+                    secrets.get_and_reveal(accessor, second)
+                );
+                Ok::<_, wasmtime::Error>((first?, second?))
+            })
+            .await??;
+        self.drop_secret(first_secret).await?;
+        self.drop_secret(second_secret).await?;
+        Ok((first, second))
+    }
+
+    async fn drop_secret(&mut self, secret: Option<ResourceAny>) -> wasmtime::Result<()> {
+        match secret {
+            Some(secret) => secret.resource_drop_async(&mut self.store).await,
+            None => Ok(()),
+        }
+    }
 }

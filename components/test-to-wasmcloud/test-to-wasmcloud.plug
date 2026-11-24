@@ -1,0 +1,3 @@
+# the adapter under test, plugged with a store
+to-wasmcloud
+from-config
