@@ -21,5 +21,5 @@ members = [
 secrets-latch-n = { path = "./crates/secrets-latch-n" }
 test-harness = { path = "./crates/test-harness" }
 tokio = { version = "1", features = ["macros", "rt"] }
-wasmtime = "50.0.1"
+wasmtime = "51.0.0"
 wit-bindgen = "0.63.0"
