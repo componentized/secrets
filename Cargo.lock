@@ -1232,6 +1232,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "to-wasmcloud"
+version = "0.1.0"
+dependencies = [
+ "test-harness",
+ "tokio",
+ "wit-bindgen",
+]
+
+[[package]]
 name = "tokio"
 version = "1.54.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

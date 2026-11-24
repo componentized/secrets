@@ -29,6 +29,15 @@ world latch {
     export componentized:secrets/latch@0.1.2-dev;
 }
 
+/// Adapts a `componentized:secrets/store` to `wasmcloud:secrets`, for components that use the
+/// secrets of a wasmCloud host.
+world to-wasmcloud {
+    import componentized:secrets/types@0.1.2-dev;
+    import componentized:secrets/store@0.1.2-dev;
+    export wasmcloud:secrets/store@2.1.0;
+    export wasmcloud:secrets/reveal@2.1.0;
+}
+
 /// Aggregates the latches it imports into one, the `latch-n` components each use the first of them,
 /// e.g. `latch-n2` uses `latch0` and `latch1`.
 world latch-n {
@@ -66,7 +75,7 @@ world test-consumer {
 }
 
 /// The host the tests run the components with, see crates/test-harness. Provides the imports of every component,
-/// and calls the latches and the probe. The host provides the latch a gate imports, as well as the
+/// and calls the latches, the probe and `wasmcloud:secrets`. The host provides the latch a gate imports, as well as the
 /// named latches a `latch-n` imports.
 world test-host {
     import latch0: componentized:secrets/latch@0.1.2-dev;
@@ -78,4 +87,6 @@ world test-host {
     import wasi:logging/logging@0.1.0-draft;
     export componentized:secrets/latch@0.1.2-dev;
     export probe;
+    export wasmcloud:secrets/store@2.1.0;
+    export wasmcloud:secrets/reveal@2.1.0;
 }

@@ -12,6 +12,7 @@ members = [
     "components/latch-n4",
     "components/latch-n5",
     "components/test-consumer",
+    "components/to-wasmcloud",
     "crates/secrets-latch-n",
     "crates/test-harness",
 ]
